@@ -61,7 +61,6 @@ robotsParserHelp revInputs =
         [ succeed (\stmt -> Loop (stmt :: revInputs))
             |= robotInputParser
 
-        --|. spaces
         , succeed
             ()
             |> map (\_ -> Done (List.reverse revInputs))
