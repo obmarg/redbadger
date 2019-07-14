@@ -1,4 +1,4 @@
-module ParserTests exposing (suite)
+module InputTests exposing (suite)
 
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
@@ -15,7 +15,7 @@ suite =
             \_ ->
                 let
                     result =
-                        Parser.run Input.parse "5 3\n1 1 E\nRFRL"
+                        Input.parse "5 3\n1 1 E\nRFRL"
                 in
                 Expect.equal result
                     (Ok
@@ -30,7 +30,7 @@ suite =
             \_ ->
                 let
                     result =
-                        Parser.run Input.parse "5 3\n1 1 E\nRFRL\n2 2 W\nR"
+                        Input.parse "5 3\n1 1 E\nRFRL\n2 2 W\nR"
                 in
                 Expect.equal result
                     (Ok

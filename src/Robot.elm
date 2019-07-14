@@ -1,4 +1,4 @@
-module Robot exposing (Coord, Instruction(..), Orientation(..), RobotPosition(..), RobotState(..), Scents, followInstructions)
+module Robot exposing (Coord, Instruction(..), Orientation(..), RobotPosition(..), RobotState(..), Scents, followInstructions, runInput)
 
 {-| A module that implements our robot functionality
 -}
@@ -115,6 +115,8 @@ robotIsOutOfBounds ( maxX, maxY ) (RobotPosition ( x, y ) _) =
     x < 0 || x > maxX || y < 0 || y > maxY
 
 
+{-| Recursively follows some instructions for a single robot.
+-}
 followInstructions : Coord -> Scents -> RobotState -> List Instruction -> RobotState
 followInstructions maxCoords scents robotState instructions =
     case ( instructions, robotState ) of
@@ -147,3 +149,44 @@ followInstructions maxCoords scents robotState instructions =
                 ( False, _ ) ->
                     -- This move doesn't put us out of bounds, so we continue to recurse.
                     followInstructions maxCoords scents (KnownPosition newPosition) restInstructions
+
+
+{-| Copied this from the Input module to avoid circular imports.
+
+Would normally restructure things a bit, but this is a coding exercise so I'll skip that for now
+
+-}
+type alias RobotInput =
+    { startingState : RobotState, instructions : List Instruction }
+
+
+{-| Copied this from the Input module to avoid circular imports.
+
+Would normally restructure things a bit, but this is a coding exercise so I'll skip that for now
+
+-}
+type alias Input =
+    { maxCoords : Coord, robots : List RobotInput }
+
+
+{-| Runs some input and returns a list of the final robot states.
+-}
+runInput : Input -> List RobotState
+runInput input =
+    let
+        foldFunc { startingState, instructions } ( scents, accumulatedResults ) =
+            let
+                finalState =
+                    followInstructions input.maxCoords scents startingState instructions
+            in
+            case finalState of
+                KnownPosition _ ->
+                    ( scents, finalState :: accumulatedResults )
+
+                Lost (RobotPosition coord _) ->
+                    ( Set.insert coord scents, finalState :: accumulatedResults )
+
+        ( _, finalResults ) =
+            List.foldl foldFunc ( Set.empty, [] ) input.robots
+    in
+    List.reverse finalResults

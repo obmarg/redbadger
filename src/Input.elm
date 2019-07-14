@@ -1,5 +1,9 @@
 module Input exposing (Input, RobotInput, RobotInputs, parse, robotInputParser)
 
+{-| This module parses our Input from a string.
+
+-}
+
 import Maybe.Extra
 import Parser exposing ((|.), (|=), Parser, Step(..), end, int, loop, map, oneOf, spaces, succeed, symbol, variable)
 import Robot exposing (Coord, Instruction(..), Orientation(..), RobotPosition(..), RobotState(..))
@@ -18,8 +22,13 @@ type alias Input =
     { maxCoords : Coord, robots : List RobotInput }
 
 
-parse : Parser Input
+parse : String -> Result (List Parser.DeadEnd) Input
 parse =
+    Parser.run parser
+
+
+parser : Parser Input
+parser =
     succeed Input
         |= coordParser
         |. spaces
